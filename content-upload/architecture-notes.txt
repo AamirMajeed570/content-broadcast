@@ -1,0 +1,66 @@
+Content Broadcasting System - Architecture Notes
+
+1. Authentication and RBAC flow
+- Users authenticate with email and password.
+- Passwords are hashed with bcrypt before storage.
+- Successful login returns a JWT containing id, email, and role.
+- Protected routes require a Bearer token.
+- Role checks are applied after authentication so principal and teacher permissions stay separated.
+
+2. Subject-based system design
+- Content records carry a normalized lowercase subject.
+- A content slot is created per subject and reused by all content in that subject.
+- Rotation is evaluated independently per subject so Maths does not interfere with Science.
+- The public endpoint can return all active subjects for a teacher or one subject via query filter.
+
+3. Upload handling approach
+- Multer stores files locally in the uploads directory.
+- Validation blocks unsupported MIME types and oversize files before the service layer runs.
+- File metadata and public file URL are saved in the database for downstream use.
+
+4. Approval workflow design
+- Teachers upload content and it enters the pending state.
+- Principals review pending content and can approve or reject.
+- Rejection requires a reason and stores it on the content row.
+- Only approved content is considered by the live broadcasting logic.
+
+5. Scheduling and rotation logic
+- Content is only eligible when it is approved, scheduled, and currently inside its time window.
+- A subject can contain many content items with different rotation orders and durations.
+- The rotation cycle length is the sum of all eligible durations for that subject.
+- The active item is resolved by computing elapsed minutes from the earliest eligible start time and applying modulo over the total cycle duration.
+- If no eligible item exists, the public API responds with an empty list instead of an error.
+
+6. Database design decisions
+- PostgreSQL is used because the assignment explicitly requests PostgreSQL or MySQL and relational consistency matters for approval and schedule joins.
+- Minimum required tables are implemented: users, content, content_slots, and content_schedule.
+- Constraints enforce valid roles, valid statuses, positive duration, and valid schedule windows.
+- Content schedule is separated from content so approval metadata and scheduling metadata remain independently manageable.
+
+7. Folder structure
+- config: environment and database configuration
+- controllers: HTTP request orchestration
+- database: schema file
+- middlewares: auth, upload, error, and 404 handling
+- routes: route declarations
+- scripts: init and seed helpers
+- services: business logic and scheduling
+- utils: shared helpers
+- validators: zod request schemas
+
+8. Middleware usage
+- Helmet improves baseline HTTP security headers.
+- CORS is enabled for frontend or public consumer integration.
+- Morgan logs requests.
+- Auth middleware validates JWTs.
+- Role middleware enforces RBAC.
+- Multer handles multipart file uploads.
+- Error middleware standardizes responses.
+
+9. Scalability approach
+- The scheduling algorithm is written as a pure service so it can move behind a cache or worker later.
+- The live endpoint already has rate limiting to protect public access.
+- Database indexes cover the common filters used by review and live-content lookups.
+- A Redis cache can be layered in front of the live endpoint without changing the controller contract.
+- S3 can replace local file storage later by swapping the upload adapter while preserving content metadata shape.
+

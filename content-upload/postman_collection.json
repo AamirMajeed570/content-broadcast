@@ -1,0 +1,95 @@
+{
+  "info": {
+    "name": "Content Broadcasting System Backend",
+    "_postman_id": "bbf45d7c-4ae3-46c2-bbd0-6d0d1e4ce000",
+    "description": "Collection for the backend technical assignment.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "teacherToken",
+      "value": ""
+    },
+    {
+      "key": "principalToken",
+      "value": ""
+    },
+    {
+      "key": "teacherId",
+      "value": "2"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth - Login Teacher",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"teacher@example.com\",\n  \"password\": \"Password123\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Auth - Login Principal",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"principal@example.com\",\n  \"password\": \"Password123\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Teacher - List Content",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{teacherToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/content"
+      }
+    },
+    {
+      "name": "Principal - Pending Content",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{principalToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/content/pending"
+      }
+    },
+    {
+      "name": "Public - Live Content By Teacher",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/content/live/{{teacherId}}"
+      }
+    }
+  ]
+}
