@@ -2,6 +2,11 @@
 
 Backend-only implementation of the technical assignment for a content broadcasting system used by principals, teachers, and public student clients.
 
+## Documentation
+
+- Detailed API reference: `API_DOCUMENTATION.md`
+- Architecture notes: `architecture-notes.txt`
+
 ## Tech Stack
 
 - Node.js
@@ -84,6 +89,8 @@ uploads/
 
 - `GET /api/content/live/:teacherId`
 - `GET /api/content/live/:teacherId?subject=maths`
+
+For request and response examples, validation rules, and edge cases for every endpoint, see `API_DOCUMENTATION.md`.
 
 ## Scheduling Behavior
 
